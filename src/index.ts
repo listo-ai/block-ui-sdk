@@ -13,6 +13,9 @@ export { useAgentClient } from "./hooks/useAgentClient";
 export { useNode } from "./hooks/useNode";
 export { useSlot } from "./hooks/useSlot";
 export { useNodes } from "./hooks/useNodes";
+// Kinds registry (read-only). Block authors occasionally need the
+// `settings_schema` of their own kind to render a settings form.
+export { useKinds } from "@listo/ui-core";
 export { useAction } from "./hooks/useAction";
 export { useSubscription } from "./hooks/useSubscription";
 export type { GraphEventHandler } from "./hooks/useSubscription";
@@ -28,6 +31,17 @@ export {
   unregisterExtensionContributions,
   extensionRegistry,
 } from "./registration";
+
+// ── Settings form (reused by blocks that render config panels) ────────────
+// Re-exports the JSON-Schema form + debounced-save hook that Studio uses
+// for its built-in property panel. Block authors wire them against the
+// `settings` slot of any node they want to edit.
+export {
+  useNodeSettings,
+  NodeSettingsForm,
+  normalizeJsonSchema,
+} from "@listo/ui-core";
+export type { NodeSettingsState } from "@listo/ui-core";
 
 // ── Re-exported types from agent-client ───────────────────────────────────
 export type {
