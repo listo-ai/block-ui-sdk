@@ -19,6 +19,8 @@ export { useKinds } from "@listo/ui-core";
 export { useAction } from "./hooks/useAction";
 export { useSubscription } from "./hooks/useSubscription";
 export type { GraphEventHandler } from "./hooks/useSubscription";
+export { useSlotWriter } from "./hooks/useSlotWriter";
+export type { SlotWriterApi, WriteSlotOptions } from "./hooks/useSlotWriter";
 
 // ── Components ────────────────────────────────────────────────────────────
 export { BlockShell } from "./components/BlockShell";
