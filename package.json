@@ -17,9 +17,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@listo/agent-client": "^0.1.0",
-    "@listo/ui-core": "^0.1.0",
-    "@listo/ui-kit": "^0.1.0"
+    "@listo/agent-client": "workspace:*",
+    "@listo/ui-core": "workspace:*",
+    "@listo/ui-kit": "workspace:*"
   },
   "peerDependencies": {
     "@tanstack/react-query": "^5.0.0",
