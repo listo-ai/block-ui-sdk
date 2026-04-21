@@ -13,7 +13,8 @@
     "./mf": {
       "import": "./dist/mf.js",
       "types": "./dist/mf.d.ts"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": ["dist"],
   "scripts": {
