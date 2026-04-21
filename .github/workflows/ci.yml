@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: block-ui-sdk
+
+      # Bootstrap: clone sibling @listo/* deps (not yet on npm)
+      - name: Clone @listo/ui-kit
+        uses: actions/checkout@v4
+        with:
+          repository: listo-ai/ui-kit
+          path: ui-kit
+
+      - name: Clone @listo/ui-core
+        uses: actions/checkout@v4
+        with:
+          repository: listo-ai/ui-core
+          path: ui-core
+
+      - name: Clone @listo/agent-client
+        uses: actions/checkout@v4
+        with:
+          repository: listo-ai/agent-client-ts
+          path: agent-client-ts
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: block-ui-sdk/package.json
+
+      # Bootstrap workspace so pnpm resolves @listo/* as local packages
+      - name: Create temp workspace
+        run: |
+          cat > pnpm-workspace.yaml << 'EOF'
+          packages:
+            - 'block-ui-sdk'
+            - 'ui-kit'
+            - 'ui-core'
+            - 'agent-client-ts'
+          EOF
+          node -e "
+            const fs = require('fs');
+            const p = JSON.parse(fs.readFileSync('block-ui-sdk/package.json', 'utf8'));
+            p.dependencies['@listo/agent-client'] = 'workspace:*';
+            p.dependencies['@listo/ui-core'] = 'workspace:*';
+            p.dependencies['@listo/ui-kit'] = 'workspace:*';
+            fs.writeFileSync('block-ui-sdk/package.json', JSON.stringify(p, null, 2));
+          "
+          # ui-core also needs its @listo/* deps patched for this workspace
+          node -e "
+            const fs = require('fs');
+            const p = JSON.parse(fs.readFileSync('ui-core/package.json', 'utf8'));
+            p.dependencies['@listo/agent-client'] = 'workspace:*';
+            p.dependencies['@listo/ui-kit'] = 'workspace:*';
+            fs.writeFileSync('ui-core/package.json', JSON.stringify(p, null, 2));
+          "
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Typecheck
+        working-directory: block-ui-sdk
+        run: pnpm typecheck
+
+      - name: Build
+        working-directory: block-ui-sdk
+        run: pnpm build
